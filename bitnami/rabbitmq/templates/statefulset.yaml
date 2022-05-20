@@ -114,7 +114,11 @@ spec:
           image: {{ template "rabbitmq.image" . }}
           imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
           {{- if .Values.containerSecurityContext.enabled }}
+          {{- if eq ( toString ( .Values.containerSecurityContext.runAsUser )) "auto" }}
+          securityContext: {{- omit .Values.containerSecurityContext "runAsUser" "enabled" | toYaml | nindent 12 }}
+          {{- else }}
           securityContext: {{- omit .Values.containerSecurityContext "enabled" | toYaml | nindent 12 }}
+          {{- end }}
           {{- end }}
           {{- if .Values.diagnosticMode.enabled }}
           command: {{- include "common.tplvalues.render" (dict "value" .Values.diagnosticMode.command "context" $) | nindent 12 }}
